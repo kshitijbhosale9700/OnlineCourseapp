@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.conf import settings
 
@@ -9,6 +8,28 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Instructor(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    full_name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.full_name
+
+
+class Learner(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    courses = models.ManyToManyField(Course, blank=True)
+
+    def __str__(self):
+        return self.user.username
 
 
 class Lesson(models.Model):
@@ -26,10 +47,12 @@ class Lesson(models.Model):
 
 
 class Question(models.Model):
-    course = models.ForeignKey(
-        Course,
+    lesson = models.ForeignKey(
+        Lesson,
         on_delete=models.CASCADE,
-        related_name="questions"
+        related_name="questions",
+        null=True,
+        blank=True
     )
     content = models.TextField()
     grade = models.IntegerField(default=1)
